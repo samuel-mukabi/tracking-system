@@ -1,0 +1,19 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": ".next",
+  "devCommand": "npm run dev",
+  "env": [
+    {
+      "key": "NEXT_PUBLIC_WS_URL",
+      "description": "WebSocket server URL for driver tracking",
+      "example": "wss://your-backend-service.railway.app"
+    }
+  ],
+  "regions": ["iad1"],
+  "functions": {
+    "api/**/*.ts": {
+      "memory": 1024,
+      "maxDuration": 300
+    }
+  }
+}
