@@ -30,7 +30,9 @@ const DriverMap = () => {
 
         const connect = () => {
             const wsUrl = process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8080';
-            socket = new WebSocket(wsUrl);
+            // Use wss:// for production HTTPS, ws:// for local development
+            const protocol = wsUrl.startsWith('ws://') ? wsUrl : wsUrl.replace(/^https:/, 'wss:').replace(/^http:/, 'ws:');
+            socket = new WebSocket(protocol);
 
             socket.onopen = () => {
                 console.log('Front-end connected to server');

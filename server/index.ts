@@ -1,9 +1,9 @@
 // server/index.ts
 import WebSocket, { WebSocketServer } from 'ws'
 
-const PORT = 8080
+const PORT = parseInt(process.env.PORT || '8080', 10)
 const wss = new WebSocketServer({ port: PORT })
-console.log(`Server running on ws://localhost:${PORT}`)
+console.log(`Server running on port ${PORT}`)
 
 const subscriptions: Record<string, WebSocket[]> = {}
 const driverPositions: Record<string, { lat: number; lon: number }> = {}

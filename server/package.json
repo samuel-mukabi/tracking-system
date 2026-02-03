@@ -4,7 +4,8 @@
   "description": "WebSocket server for real-time driver tracking",
   "main": "index.js",
   "scripts": {
-    "start": "node --loader ts-node/esm index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
     "dev": "ts-node index.ts",
     "simulate": "ts-node driver-simulator.ts",
     "test-client": "ts-node test-client.ts",
