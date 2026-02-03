@@ -7,9 +7,9 @@
     "dev:server": "cd server && npm run dev",
     "dev:simulate": "cd server && npm run simulate",
     "dev:all": "concurrently \"npm run dev\" \"npm run dev:server\" \"npm run dev:simulate\"",
-    "build": "next build",
-    "build:railway": "next build && cd server && npm install && npm run build",
-    "start": "concurrently \"next start\" \"npm run start:server\" \"cd server && npm run start:simulate\"",
+    "build": "next build && cd server && npm run build",
+    "build:railway": "next build && cd server && npm run build",
+    "start": "next start",
     "start:server": "cd server && npm start",
     "lint": "eslint"
   },
