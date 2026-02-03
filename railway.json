@@ -1,12 +1,9 @@
 {
-  "build": {
-    "builder": "nixpacks"
-  },
-  "deploy": {
-    "startCommand": "npm run build && npm start",
-    "restartPolicyMaxRetries": 5,
-    "restartPolicyWindow": 60
+  "builder": "nixpacks",
+  "nixpacks": {
+    "providers": ["nodejs"],
+    "nodejs": {
+      "version": "25"
+    }
   }
 }
-
-
