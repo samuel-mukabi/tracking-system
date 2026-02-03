@@ -1,0 +1,9 @@
+{
+  "builder": "nixpacks",
+  "nixpacks": {
+    "providers": ["nodejs"],
+    "nodejs": {
+      "version": "25"
+    }
+  }
+}
