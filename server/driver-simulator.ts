@@ -5,7 +5,7 @@
  */
 
 import { WebSocket } from 'ws';
-import { ROAD_PATHS } from "./route-points.js";
+import {ROAD_PATHS} from "./route-points.ts";
 
 interface DriverData {
     driverId: string;
@@ -23,31 +23,20 @@ interface DriverData {
 function generateDriverRoutes(): Record<string, { startLat: number; startLon: number; name: string }> {
     const routes: Record<string, { startLat: number; startLon: number; name: string }> = {};
 
-    // Nairobi center coordinates
-    const centerLat = -1.2921;
-    const centerLon = 36.8219;
-
-    // Variation range (roughly 20km radius around the center)
-    const latVariation = 0.15; // approx 15km
-    const lonVariation = 0.15;
+    // Kenya geographic bounds
+    const minLat = -4.6;
+    const maxLat = 5.4;
+    const minLon = 33.9;
+    const maxLon = 41.8;
 
     const areas = [
-        'Nairobi CBD',
-        'Westlands',
-        'Karen',
-        'Lavington',
-        'Parklands',
-        'Kilimani',
-        'Upperhill',
-        'Langata',
-        'Muthaiga',
-        'Riverside',
+        "Kenya"
     ];
 
     for (let i = 1; i <= 100; i++) {
         const driverId = `driver_${String(i).padStart(3, '0')}`;
-        const startLat = centerLat + (Math.random() - 0.5) * latVariation * 2;
-        const startLon = centerLon + (Math.random() - 0.5) * lonVariation * 2;
+        const startLat = minLat + Math.random() * (maxLat - minLat);
+        const startLon = minLon + Math.random() * (maxLon - minLon);
         const areaIndex = (i - 1) % areas.length;
 
         routes[driverId] = {
@@ -144,7 +133,7 @@ class DriverSimulator {
     }
 
     /**
-     * Update a single driver's location with realistic movement
+     * Update a single driver's location following their pre-generated path
      */
     private updateDriverLocation(driverId: string): void {
         const driver = this.drivers.get(driverId);
@@ -153,30 +142,50 @@ class DriverSimulator {
         const path = ROAD_PATHS[driverId];
         if (!path || path.length === 0) return;
 
-        // Ensure routeIndex is initialized
-        if (driver.routeIndex === undefined) {
-            driver.routeIndex = 0;
+        // Current and next waypoint
+        const currentIndex = driver.routeIndex || 0;
+        const nextIndex = (currentIndex + 1) % path.length;
+        
+        const currentPos = path[currentIndex];
+        const nextPos = path[nextIndex];
+
+        if (!currentPos || !nextPos) return;
+
+        // Linear interpolation between waypoints for smooth-ish movement
+        // In a real app, this would be more sophisticated
+        const progress = 0.1; // Move 10% towards next waypoint each second
+        
+        driver.lat = currentPos.lat + (nextPos.lat - currentPos.lat) * progress;
+        driver.lon = currentPos.lon + (nextPos.lon - currentPos.lon) * progress;
+        
+        // Update the actual waypoint in the path to reflect current position 
+        // OR just increment index if we are close enough.
+        // For simplicity, let's just move towards the next waypoint and update index
+        
+        // Update index if we've reached (or passed) the next waypoint significantly
+        // or just move through the path linearly for simulation purposes.
+        if (Math.abs(driver.lat - nextPos.lat) < 0.001 && Math.abs(driver.lon - nextPos.lon) < 0.001) {
+            driver.routeIndex = nextIndex;
+        } else {
+            // Keep moving towards nextPos
+            path[currentIndex] = { lat: driver.lat, lon: driver.lon };
         }
 
-        const target = path[driver.routeIndex];
-        if (!target) return;
+        // Keep drivers inside Kenya
+        driver.lat = Math.max(-4.6, Math.min(5.4, driver.lat));
+        driver.lon = Math.max(33.9, Math.min(41.8, driver.lon));
 
-        const latDiff = target.lat - driver.lat;
-        const lonDiff = target.lon - driver.lon;
+        // Randomly "shake" the path every second as requested
+        driver.lat += (Math.random() - 0.5) * 0.002;
+        driver.lon += (Math.random() - 0.5) * 0.002;
 
-        // Calculate heading based on direction of travel
-        const angleRad = Math.atan2(lonDiff, latDiff);
+        // Update heading based on movement direction
+        const latChange = nextPos.lat - currentPos.lat;
+        const lonChange = nextPos.lon - currentPos.lon;
+        const angleRad = Math.atan2(lonChange, latChange);
         driver.heading = (angleRad * 180) / Math.PI;
         if (driver.heading < 0) driver.heading += 360;
 
-        const step = 0.00005;
-
-        driver.lat += Math.sign(latDiff) * Math.min(Math.abs(latDiff), step);
-        driver.lon += Math.sign(lonDiff) * Math.min(Math.abs(lonDiff), step);
-
-        if (Math.abs(latDiff) < step && Math.abs(lonDiff) < step) {
-            driver.routeIndex = (driver.routeIndex + 1) % path.length;
-        }
         // Send updated location to server
         if (this.ws && this.isConnected) {
             this.ws.send(JSON.stringify({

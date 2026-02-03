@@ -4,23 +4,20 @@ export type RoutePoint = {
 };
 
 // Generate realistic route paths for all drivers
-function generateRoutePaths(): Record<string, RoutePoint[]> {
+export function generateRoutePaths(): Record<string, RoutePoint[]> {
     const paths: Record<string, RoutePoint[]> = {};
 
-    // Nairobi center coordinates
-    const centerLat = -1.2921;
-    const centerLon = 36.8219;
 
     // Generate routes for 100 drivers
     for (let i = 1; i <= 100; i++) {
         const driverId = `driver_${String(i).padStart(3, '0')}`;
 
-        // Random starting position
-        const startLat = centerLat + (Math.random() - 0.5) * 0.15 * 2;
-        const startLon = centerLon + (Math.random() - 0.5) * 0.15 * 2;
+        // Spread drivers across the whole country
+        const startLat = -4.6 + Math.random() * (5.4 - (-4.6));
+        const startLon = 33.9 + Math.random() * (41.8 - 33.9);
 
         // Generate 8-12 waypoints for each driver's route
-        const numWaypoints = 8 + Math.floor(Math.random() * 5);
+        const numWaypoints = 15 + Math.floor(Math.random() * 10);
         const waypoints: RoutePoint[] = [
             { lat: startLat, lon: startLon }
         ];
@@ -30,16 +27,16 @@ function generateRoutePaths(): Record<string, RoutePoint[]> {
         let currentLon = startLon;
 
         for (let j = 1; j < numWaypoints; j++) {
-            // Small random movements (±0.002 degrees ≈ ±200 meters)
-            const latChange = (Math.random() - 0.5) * 0.004;
-            const lonChange = (Math.random() - 0.5) * 0.004;
+            // Larger random movements to cover more ground
+            const latChange = (Math.random() - 0.5) * 0.5;
+            const lonChange = (Math.random() - 0.5) * 0.5;
 
             currentLat += latChange;
             currentLon += lonChange;
 
-            // Keep drivers within Nairobi area
-            currentLat = Math.max(-1.4, Math.min(-1.18, currentLat));
-            currentLon = Math.max(36.70, Math.min(36.95, currentLon));
+            // Keep drivers within Kenya borders
+            currentLat = Math.max(-4.6, Math.min(5.4, currentLat));
+            currentLon = Math.max(33.9, Math.min(41.8, currentLon));
 
             waypoints.push({ lat: currentLat, lon: currentLon });
         }
