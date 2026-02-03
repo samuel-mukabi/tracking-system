@@ -63,7 +63,7 @@ function generateDriverRoutes(): Record<string, { startLat: number; startLon: nu
 const DRIVER_ROUTES = generateDriverRoutes();
 
 const SIMULATION_INTERVAL = 1000; // Update every 1 second
-const SERVER_URL = process.env.SERVER_URL || 'ws://localhost:8080';
+const SERVER_URL = process.env.SERVER_URL || `ws://localhost:${process.env.PORT || '8080'}`;
 
 class DriverSimulator {
     private drivers: Map<string, DriverData> = new Map();
