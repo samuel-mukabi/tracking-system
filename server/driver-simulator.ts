@@ -5,7 +5,7 @@
  */
 
 import { WebSocket } from 'ws';
-import {ROAD_PATHS} from "./route-points.ts";
+import { ROAD_PATHS } from './route-points.ts';
 
 interface DriverData {
     driverId: string;
