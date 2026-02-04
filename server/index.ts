@@ -1,5 +1,5 @@
 // server/index.ts
-import WebSocket, { WebSocketServer } from 'ws'
+import WebSocket, { WebSocketServer, type RawData } from 'ws'
 
 const PORT = parseInt(process.env.PORT || '8080', 10)
 const wss = new WebSocketServer({ port: PORT })
@@ -16,10 +16,10 @@ type IncomingMessage = {
     lon?: number
 }
 
-wss.on('connection', (ws) => {
+wss.on('connection', (ws: WebSocket) => {
     console.log('Client connected')
 
-    ws.on('message', (message) => {
+    ws.on('message', (message: RawData) => {
         try {
             const data = JSON.parse(message.toString()) as IncomingMessage
 

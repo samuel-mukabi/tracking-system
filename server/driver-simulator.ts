@@ -4,8 +4,8 @@
  * Sends location updates via WebSocket to the tracking server
  */
 
-import { WebSocket } from 'ws';
-import { ROAD_PATHS } from './route-points.ts';
+import WebSocket from 'ws';
+import { ROAD_PATHS } from './route-points.js';
 
 interface DriverData {
     driverId: string;
